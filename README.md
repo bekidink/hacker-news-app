@@ -1,97 +1,54 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Hacker News Reader – Technical Assessment
 
-# Getting Started
+A high-performance Hacker News client built with React Native CLI. I focused on creating a "snappy" feel—optimizing for 60 FPS scrolling and ensuring that data is available instantly, even when the user is deep in a subway tunnel or on airplane mode.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 🛠 Getting Started
 
-## Step 1: Start Metro
+1.  **Install Dependencies**:
+    ```bash
+    npm install
+    ```
+2.  **Android**:
+    * Fire up an emulator (API 30+).
+    * Run `npx react-native run-android`.
+3.  **iOS**:
+    * `cd ios && pod install && cd ..`
+    * Run `npx react-native run-ios`.
+4.  **Tests**:
+    * `npm test` runs the Jest and RNTL suites I’ve set up for logic and interaction validation.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+---
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## 🏗 My Architectural Approach
 
-```sh
-# Using npm
-npm start
+### **State Management: Why Zustand?**
+I decided to go with **Zustand** over Redux Toolkit. While Redux is great for massive enterprise apps, it often introduces a lot of "boilerplate noise." For this project, I wanted a store that was easy to read and highly performant. Zustand’s hooks-based API allowed me to keep the logic for fetching stories and managing bookmarks separate and clean without the overhead of actions and reducers.
 
-# OR using Yarn
-yarn start
-```
+### **Data Persistence: Choosing MMKV**
+I swapped out the standard `AsyncStorage` for **MMKV**. 
+* **The Reason**: `AsyncStorage` is asynchronous, which often leads to a "flicker" where the UI shows an empty state for a split second while the data loads. Because MMKV uses JSI to talk to C++ directly, I can read the user's bookmarks **synchronously** as the app starts. It makes the app feel native and expensive.
 
-## Step 2: Build and run your app
+### **Performance Optimization**
+I spent extra time on the `FlatList` configuration. By using `getItemLayout`, I’ve told the list exactly how tall every row is. This prevents the "jumping" behavior you sometimes see when scrolling through long lists, as the list doesn't have to calculate dimensions on the fly.
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+---
 
-### Android
+## 📝 Section 02: Technical Deep-Dive
 
-```sh
-# Using npm
-npm run android
+**1. Bridge vs. JSI**
+The old **Bridge** was like sending a letter through the mail—you had to bundle your data into a JSON string, send it over, and wait for the other side to unpack it. It’s inherently asynchronous. **JSI (JavaScript Interface)** is like having a direct conversation. It lets JavaScript call C++ methods directly. This is why libraries like Reanimated (which I used for the swipe gestures) feel so much smoother now.
 
-# OR using Yarn
-yarn android
-```
+**2. Taming the FlatList**
+Beyond the basic `keyExtractor`, I used `initialNumToRender` to make sure the first screenful of data pops up instantly. I also wrapped the `ArticleCard` in `React.memo` to ensure that if I sort the list or update a single item, the entire list doesn't struggle to re-render.
 
-### iOS
+**3. `useCallback` vs. `useMemo`**
+I use `useMemo` as a "cache" for expensive data—like the filtered and sorted list of stories. It ensures I’m not re-sorting 500 items every time a user types a single letter in the search bar. I use `useCallback` for functions passed to child components to keep their "identity" stable, preventing those children from re-rendering for no reason.
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+**4. Why this State Choice?**
+Zustand was the right tool for the job here. It’s lightweight (under 2kb) and doesn't wrap the whole app in a Provider, which makes testing and maintenance much simpler. It gave me the power of global state with the simplicity of local hooks.
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+**5. Designing for the "Offline" World**
+A mobile app shouldn't just "break" when the Wi-Fi drops. I implemented a three-tier strategy: 
+1. **Visibility**: A non-intrusive banner appears when NetInfo detects a loss of signal.
+2. **Persistence**: Bookmarks are saved to MMKV so they are always there.
+3. **Graceful Failure**: If a fetch fails, the user sees a friendly error state with a "Retry" button rather than just a white screen.
