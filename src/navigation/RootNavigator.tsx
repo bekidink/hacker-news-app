@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import FeedStackNavigator from './FeedStackNavigator';
 import BookmarksScreen from '../features/bookmarks/BookmarksScreen';
 import { RootTabParamList } from './types';
+import { BookmarkingSelectedIcon, BookmarkingUnselectedIcon, HomeSelectedIcon, HomeUnselectedIcon } from '../constants/icons';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 const Stack = createNativeStackNavigator(); // Optional root stack if needed later
@@ -25,8 +26,8 @@ function MainTabs() {
         component={FeedStackNavigator}
         options={{
           tabBarLabel: 'Feed',
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="newspaper-outline" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            focused ? <HomeSelectedIcon height={24} width={20}  /> : <HomeUnselectedIcon height={24} width={20}  />  
           ),
         }}
       />
@@ -36,8 +37,8 @@ function MainTabs() {
         component={BookmarksScreen}
         options={{
           tabBarLabel: 'Bookmarks',
-          tabBarIcon: ({ color, size }) => (
-            <Icon name="bookmark-outline" size={size} color={color} />
+          tabBarIcon: ({ color, focused }) => (
+            focused ? <BookmarkingSelectedIcon height={24} width={20}  /> : <BookmarkingUnselectedIcon height={24} width={20}  />  
           ),
         }}
       />
