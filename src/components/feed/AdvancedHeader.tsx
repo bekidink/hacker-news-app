@@ -23,9 +23,7 @@ export const AdvancedHeader = () => {
             </View>
           </View>
           
-          <TouchableOpacity style={styles.searchButton} activeOpacity={0.7}>
-            <Text style={styles.iconText}>🔍</Text>
-          </TouchableOpacity>
+        
         </View>
       </View>
     </View>
@@ -84,18 +82,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#3B82F6', 
     marginHorizontal: 6,
     marginTop: 8,
-  },
-  searchButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: '#F9FAFB',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-  },
-  iconText: {
-    fontSize: 18,
   }
+  
 });
