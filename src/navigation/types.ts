@@ -1,5 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { Story } from '../types';
 
 export type RootTabParamList = {
   FeedTab: undefined;
@@ -8,7 +9,7 @@ export type RootTabParamList = {
 
 export type FeedStackParamList = {
   ArticleList: undefined;
-  ArticleDetail: { storyId: number };
+  ArticleDetail: { story: Story };
 };
 
 export type RootTabScreenProps<T extends keyof RootTabParamList> = 

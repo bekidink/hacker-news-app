@@ -24,7 +24,7 @@ export const useNewsStore = create<NewsState>((set) => ({
     
     try {
       const data = await newsApi.fetchTopStoriesDetailed(20);
-      
+      console.log("sdf",data)
       set({ 
         stories: data, 
         loading: false, 
