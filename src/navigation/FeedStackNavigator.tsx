@@ -15,7 +15,7 @@ export default function FeedStackNavigator() {
         component={ArticleListScreen}
         options={{
           title: 'Hacker News',
-          headerShown: true,
+          headerShown: false,
         }}
       />
 
